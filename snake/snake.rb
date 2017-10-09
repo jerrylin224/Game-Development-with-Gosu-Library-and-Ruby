@@ -15,55 +15,85 @@ class Apple
   end
 end
 
-class Game < Gosu::Window
-  def initialize
-    super(800, 600)
-    self.caption = "Snake"
+class Segment
+  attr_reader :x, :y
+  attr_accessor :x_direction, :y_direction
+
+  def initialize(x, y, c, game)
+    @game = game
+    @x, @y, @c = x, y, c
+    # draw_quad(@x, @y, c, @x + 10, @y, c, @x + 10, @y + 10, c, @x, @y + 10, c)
     @position = []
     @x = 200
     @y = 200
     @x_direction = 3
     @y_direction = 0
-    @apple = Apple.new(self)
-    @visible = 1
   end
 
   def draw
-    c = Gosu::Color::GREEN
-    draw_quad(@x, @y, c, @x + 10, @y, c, @x + 10, @y + 10, c, @x, @y + 10, c) if @visible > 0
-    @apple.draw
+    @game.draw_quad(@x, @y, @c, @x + 10, @y, @c, @x + 10, @y + 10, @c, @x, @y + 10, @c)
   end
 
   def update
     @position = [@x += @x_direction, @y += @y_direction]
+  end
+end
+
+class Game < Gosu::Window
+  def initialize
+    super(800, 600)
+    self.caption = "Snake"
+    @apple = Apple.new(self)
+    @c = Gosu::Color::GREEN
+    @segment = Segment.new(@x, @y, @c, self)
+  end
+
+  def draw
+    # draw_quad(@x, @y, c, @x + 10, @y, c, @x + 10, @y + 10, c, @x, @y + 10, c)
+    @segment.draw
+    @apple.draw
+  end
+
+  def update
+    @segment.update
+    # @position = [@x += @x_direction, @y += @y_direction]
     collect_apple
   end
 
   def collect_apple
-    if Gosu.distance(@x, @y, @apple.pos_x, @apple.pos_y) < 10
-      @apple = Apple.new(self)
+    @apple = Apple.new(self) if apple_eaten?
+  end
+
+  def apple_eaten?
+    if Gosu.distance(@segment.x, @segment.y, @apple.pos_x, @apple.pos_y) < 10
+      return true
     end
   end
 
+  def increase_segment
+    #if apple_eaten?
+
+  end
+
   def button_down(id)
-    if id == Gosu::KB_RIGHT && @x_direction != -3
-      @x_direction = 3
-      @y_direction = 0
+    if id == Gosu::KB_RIGHT && @segment.x_direction != -3
+      @segment.x_direction = 3
+      @segment.y_direction = 0
     end
 
-    if id == Gosu::KB_LEFT && @x_direction != 3
-      @x_direction = -3
-      @y_direction = 0
+    if id == Gosu::KB_LEFT && @segment.x_direction != 3
+      @segment.x_direction = -3
+      @segment.y_direction = 0
     end
 
-    if id == Gosu::KB_DOWN && @y_direction != -3
-      @x_direction = 0
-      @y_direction = 3
+    if id == Gosu::KB_DOWN && @segment.y_direction != -3
+      @segment.x_direction = 0
+      @segment.y_direction = 3
     end
 
-    if id == Gosu::KB_UP && @y_direction !=  3
-      @x_direction = 0
-      @y_direction = -3
+    if id == Gosu::KB_UP && @segment.y_direction !=  3
+      @segment.x_direction = 0
+      @segment.y_direction = -3
     end
 
     if id == Gosu::KB_ESCAPE

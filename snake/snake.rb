@@ -1,5 +1,8 @@
 require 'gosu'
+gem 'pry', '= 0.10.3'
 require 'pry'
+require 'pry-nav'
+require 'pry-remote'
 
 class Snake
   attr_reader :x, :y, :segments
@@ -70,6 +73,22 @@ class Snake
       return true
     end
   end
+
+  def hit_self?
+    segments = Array.new(@segments)
+    if segments.length > 5
+      # Remove the head segment from consideration
+      segments.pop((5 * @speed))
+      segments.each do |s|
+        if Gosu::distance(@head_segment.x, @head_segment.y, s.x, s.y) < 1
+          return true
+        else
+          next
+        end
+      end
+      return false
+    end
+  end
 end
 
 class Segment
@@ -133,7 +152,7 @@ class Game < Gosu::Window
       collect_apple
       @snake.update_position
       @snake.ticker -= 1 if @snake.ticker > 0
-      @playing = false if @snake.hit_wall?
+      @playing = false if @snake.hit_wall? || @snake.hit_self?
     end
   end
 

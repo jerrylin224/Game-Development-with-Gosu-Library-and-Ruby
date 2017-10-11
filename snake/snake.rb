@@ -24,9 +24,9 @@ class Snake
     end
   end
 
-  def update_position
+  def update_position(apple)
     add_segment
-    @segments.shift(1)# unless @ticker > 0
+    @segments.shift(1) unless @ticker > 0
   end
 
   def add_segment
@@ -60,6 +60,7 @@ class Snake
 
   def ate_apple?(apple)
     if Gosu.distance(@head_segment.x, @head_segment.y, apple.pos_x, apple.pos_y) < 10
+      @ticker += 10
       return true
     end
   end
@@ -119,7 +120,7 @@ class Game < Gosu::Window
     # @segment.update
     # @position = [@x += @x_direction, @y += @y_direction]
     collect_apple
-    @snake.update_position
+    @snake.update_position(@apple)
     @snake.ticker -= 1 if @snake.ticker > 0
   end
 

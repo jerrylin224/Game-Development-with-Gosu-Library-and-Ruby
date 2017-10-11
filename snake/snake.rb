@@ -24,7 +24,7 @@ class Snake
     end
   end
 
-  def update_position(apple)
+  def update_position
     add_segment
     @segments.shift(1) unless @ticker > 0
   end
@@ -61,6 +61,12 @@ class Snake
   def ate_apple?(apple)
     if Gosu.distance(@head_segment.x, @head_segment.y, apple.pos_x, apple.pos_y) < 10
       @ticker += 10
+      return true
+    end
+  end
+
+  def hit_wall?
+    if @head_segment.x > 790 || @head_segment.x <  0 || @head_segment.y < 0 || @head_segment.y > 600
       return true
     end
   end
@@ -107,21 +113,28 @@ class Game < Gosu::Window
     @c = Gosu::Color::GREEN
     @snake = Snake.new(self)
     # @segment = Segment.new(@x, @y, @c, self)
+    @font = Gosu::Font.new(30)
+    @playing = true
   end
 
   def draw
     # draw_quad(@x, @y, c, @x + 10, @y, c, @x + 10, @y + 10, c, @x, @y + 10, c)
     # binding.pry
-    @snake.draw
-    @apple.draw
+      @snake.draw
+      @apple.draw
+
+      @font.draw("Game Over!", 300, 300, 3) unless @playing
   end
 
   def update
+    if @playing
     # @segment.update
     # @position = [@x += @x_direction, @y += @y_direction]
-    collect_apple
-    @snake.update_position(@apple)
-    @snake.ticker -= 1 if @snake.ticker > 0
+      collect_apple
+      @snake.update_position
+      @snake.ticker -= 1 if @snake.ticker > 0
+      @playing = false if @snake.hit_wall?
+    end
   end
 
   def collect_apple
@@ -135,19 +148,19 @@ class Game < Gosu::Window
   end
 
   def button_down(id)
-    if id == Gosu::KB_RIGHT && @snake.direction != "right"
+    if id == Gosu::KB_RIGHT && @snake.direction != "right" && @snake.direction != "left"
       @snake.direction = "right"
     end
 
-    if id == Gosu::KB_LEFT && @snake.direction != "left"
+    if id == Gosu::KB_LEFT && @snake.direction != "left" && @snake.direction != "right"
       @snake.direction = "left"
     end
 
-    if id == Gosu::KB_DOWN && @snake.direction != "down"
+    if id == Gosu::KB_DOWN && @snake.direction != "down" && @snake.direction != "up"
       @snake.direction = "down"
     end
 
-    if id == Gosu::KB_UP && @snake.direction !=  "up"
+    if id == Gosu::KB_UP && @snake.direction !=  "up" && @snake.direction != "down"
       @snake.direction = "up"
     end
 

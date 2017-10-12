@@ -132,10 +132,14 @@ class Game < Gosu::Window
   end
 
   def draw
-      @snake.draw
-      @apple.draw
-      @font.draw("Game Over!", 300, 300, 3) unless @playing
-      @font.draw("Score: #{@score.to_s}", 620, 50, 3)
+    @snake.draw
+    @apple.draw
+    @font.draw("Score: #{@score.to_s}", 620, 50, 3)
+
+    unless @playing
+      @font.draw("Game Over!", 300, 300, 3)
+      @font.draw("Press Space Bar to Play Again", 190, 350, 3)
+    end
   end
 
   def update
@@ -173,6 +177,14 @@ class Game < Gosu::Window
 
     if id == Gosu::KB_ESCAPE
       close
+    end
+
+    unless @playing
+      if id == Gosu::KbSpace
+        @playing = true
+        @score = 0
+        @snake = Snake.new(self)
+      end
     end
   end
 end

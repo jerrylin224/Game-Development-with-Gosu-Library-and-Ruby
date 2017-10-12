@@ -10,7 +10,6 @@ class Snake
 
   def initialize(game)
     @game = game
-    # draw_quad(@x, @y, c, @x + 10, @y, c, @x + 10, @y + 10, c, @x, @y + 10, c)
     @x = 200
     @y = 200
     @speed = 3
@@ -103,10 +102,6 @@ class Segment
   def draw
     @game.draw_quad(@x, @y, @c, @x + 10, @y, @c, @x + 10, @y + 10, @c, @x, @y + 10, @c)
   end
-
-#  def update
-#    @position = [@x += @x_direction, @y += @y_direction]
-#  end
 end
 
 class Apple
@@ -114,8 +109,8 @@ class Apple
 
   def initialize(game)
     @game = game
-    @pos_x = (rand * 800).round
-    @pos_y = (rand * 600).round
+    @pos_x = (rand * 790).round
+    @pos_y = (rand * 590).round
     @c = Gosu::Color::RED
   end
 
@@ -131,24 +126,20 @@ class Game < Gosu::Window
     @apple = Apple.new(self)
     @c = Gosu::Color::GREEN
     @snake = Snake.new(self)
-    # @segment = Segment.new(@x, @y, @c, self)
+    @score = 0
     @font = Gosu::Font.new(30)
     @playing = true
   end
 
   def draw
-    # draw_quad(@x, @y, c, @x + 10, @y, c, @x + 10, @y + 10, c, @x, @y + 10, c)
-    # binding.pry
       @snake.draw
       @apple.draw
-
       @font.draw("Game Over!", 300, 300, 3) unless @playing
+      @font.draw("Score: #{@score.to_s}", 620, 50, 3)
   end
 
   def update
     if @playing
-    # @segment.update
-    # @position = [@x += @x_direction, @y += @y_direction]
       collect_apple
       @snake.update_position
       @snake.ticker -= 1 if @snake.ticker > 0
@@ -157,13 +148,10 @@ class Game < Gosu::Window
   end
 
   def collect_apple
-    @apple = Apple.new(self) if @snake.ate_apple?(@apple)
-  end
-
-
-  def increase_segment
-    #if apple_eaten?
-
+    if @snake.ate_apple?(@apple)
+      @apple = Apple.new(self)
+      @score += 10
+    end
   end
 
   def button_down(id)

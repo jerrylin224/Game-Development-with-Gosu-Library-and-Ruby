@@ -21,9 +21,7 @@ class Snake
   end
 
   def draw
-    @segments.each do |s|
-      s.draw
-    end
+    @segments.each(&:draw)
   end
 
   def update_position
@@ -81,8 +79,6 @@ class Snake
       segments.each do |s|
         if Gosu::distance(@head_segment.x, @head_segment.y, s.x, s.y) < 1
           return true
-        else
-          next
         end
       end
       return false
@@ -124,11 +120,11 @@ class Game < Gosu::Window
     super(800, 600)
     self.caption = "Snake"
     @apple = Apple.new(self)
-    @c = Gosu::Color::GREEN
     @snake = Snake.new(self)
-    @score = 0
     @font = Gosu::Font.new(30)
+    @c = Gosu::Color::GREEN
     @playing = true
+    @score = 0
   end
 
   def draw
@@ -181,9 +177,10 @@ class Game < Gosu::Window
 
     unless @playing
       if id == Gosu::KbSpace
+        @snake = Snake.new(self)
+        @apple = Apple.new(self)
         @playing = true
         @score = 0
-        @snake = Snake.new(self)
       end
     end
   end
